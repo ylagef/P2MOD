@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Interprete SYSTEM "iml.dtd">
+<Interprete>
+    <Nombre>
+        <NombreC>Joaquin Sabina</NombreC>
+        <Id>jsabina</Id>
+    </Nombre>
+    <Nacionalidad>español</Nacionalidad>
+    <Album tipo="recopilatorio">
+        <NombreA>500 Noches para una Crisis (En Directo)</NombreA>
+        <Año>2015</Año>
+        <Cancion estilo="Canción de autor">
+            <Duracion>8:26</Duracion>
+            <NombreT>Ahora Que...</NombreT>
+            <Version>
+                <Nombre>
+                    <NombreC>Ed Sheeran</NombreC>
+                    <Id>edsheeran</Id>
+                </Nombre>
+                <IML>EdSheeran.xml</IML>
+            </Version>
+        </Cancion>
+        <Cancion estilo="Canción de autor">
+            <Duracion>5:52</Duracion>
+            <NombreT>19 Dias y 500 Noches</NombreT>
+            <Version>
+                <Nombre>
+                    <NombreC>Birdy</NombreC>
+                    <Id>birdy</Id>
+                </Nombre>
+                <IML>Birdy.xml</IML>
+            </Version>
+        </Cancion>
+        <Cancion estilo="Canción de autor">
+            <Duracion>8:36</Duracion>
+            <NombreT>Barbi Superestar</NombreT>
+        </Cancion>
+        <Cancion estilo="Canción de autor">
+            <Duracion>4:48</Duracion>
+            <NombreT>Una Cancion para la Magdalena</NombreT>
+        </Cancion>
+    </Album>
+    <Album tipo="recopilatorio">
+        <NombreA>Esencial Joaquin Sabina</NombreA>
+        <Año>2014</Año>
+        <Cancion estilo="Canción de autor">
+            <Duracion>5:02</Duracion>
+            <NombreT>Y Nos Dieron Las Diez</NombreT>
+        </Cancion>
+        <Cancion estilo="Canción de autor">
+            <Duracion>3:57</Duracion>
+            <NombreT>Por el Bulevar de los Sueños Rotos</NombreT>
+        </Cancion>
+        <Cancion estilo="Canción de autor">
+            <Duracion>4:10</Duracion>
+            <NombreT>Tiramisu de Limon</NombreT>
+        </Cancion>
+        <Cancion estilo="Canción de autor">
+            <Duracion>4:14</Duracion>
+            <NombreT>Caballo de Carton</NombreT>
+        </Cancion>
+    </Album>
+</Interprete>

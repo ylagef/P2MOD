@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Interprete SYSTEM "iml.dtd">
+<Interprete>
+    <Nombre>
+        <NombreC>Ed Sheeran</NombreC>
+        <Id>edsheeran</Id>
+    </Nombre>
+    <Nacionalidad>americano</Nacionalidad>
+    <Album tipo="nuevo" temas="4">
+        <NombreA>X (Wembley Edition)</NombreA>
+        <Año>2015</Año>
+        <Cancion estilo="pop">
+            <Duracion>4:13</Duracion>
+            <NombreT>One</NombreT>
+        </Cancion>
+        <Cancion estilo="pop">
+            <Duracion>4:05</Duracion>
+            <NombreT>I'm A Mess</NombreT>
+        </Cancion>
+        <Cancion estilo="pop">
+            <Duracion>3:55</Duracion>
+            <NombreT>Sing</NombreT>
+        </Cancion>
+        <Cancion estilo="pop">
+            <Duracion>3:40</Duracion>
+            <NombreT>Don't</NombreT>
+        </Cancion>
+        <Cancion estilo="pop">
+            <Duracion>3:46</Duracion>
+            <NombreT>Nina</NombreT>
+        </Cancion>
+        <Cancion estilo="pop">
+            <Duracion>4:19</Duracion>
+            <NombreT>Photograph</NombreT>
+        </Cancion>
+        <Cancion estilo="pop">
+            <Duracion>5:00</Duracion>
+            <NombreT>Bloodstream</NombreT>
+        </Cancion>
+        <Cancion estilo="pop">
+            <Duracion>4:01</Duracion>
+            <NombreT>Tenerife Sea</NombreT>
+        </Cancion>
+        <Cancion estilo="pop">
+            <Duracion>3:25</Duracion>
+            <NombreT>Runaway</NombreT>
+        </Cancion>
+        <Cancion estilo="pop">
+            <Duracion>4:10</Duracion>
+            <NombreT>The Man</NombreT>
+        </Cancion>
+        <Cancion estilo="pop">
+            <Duracion>4:42</Duracion>
+            <NombreT>Thinking Out Loud</NombreT>
+        </Cancion>
+        <Cancion estilo="pop">
+            <Duracion>5:14</Duracion>
+            <NombreT>Afire Love</NombreT>
+        </Cancion>
+        <Cancion estilo="pop">
+            <Duracion>3:28</Duracion>
+            <NombreT>Take It Back</NombreT>
+        </Cancion>
+    </Album>
+    <Album tipo="recopilatorio" temas="4">
+        <NombreA>5</NombreA>
+        <Año>2014</Año>
+        <Cancion estilo="pop">
+            <Duracion>4:05</Duracion>
+            <NombreT>You need me, I don't need you</NombreT>
+        </Cancion>
+        <Cancion estilo="pop">
+            <Duracion>4:29</Duracion>
+            <NombreT>So</NombreT>
+        </Cancion>
+        <Cancion estilo="pop">
+            <Duracion>3:38</Duracion>
+            <NombreT>Be Like You</NombreT>
+        </Cancion>
+        <Cancion estilo="pop">
+            <Duracion>4:26</Duracion>
+            <NombreT>The City</NombreT>
+        </Cancion>
+        <Cancion estilo="pop">
+            <Duracion>4:26</Duracion>
+            <NombreT>Sun Burn</NombreT>
+        </Cancion>
+    </Album>
+</Interprete>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Interprete SYSTEM "iml.dtd">
+        <Interprete>
+    <Nombre>
+        <NombreC>Birdy</NombreC>
+        <Id>Birdy</Id>
+    </Nombre>
+    <Nacionalidad>americana</Nacionalidad>
+    <Album tipo="nuevo">
+        <NombreA>Fire Within</NombreA>
+        <Año>2013</Año>
+        <Cancion estilo="pop">
+            <NombreT>Skinny Love</NombreT>
+            <Duracion>3:21</Duracion>
+        </Cancion>
+        <Cancion estilo="pop">
+            <NombreT>Wings</NombreT>
+            <Duracion>4:12</Duracion>
+            <Version>
+                <Nombre>
+                    <NombreC>Vetusta Morla</NombreC>
+                    <Id>vmorla</Id>
+                </Nombre>
+                <IML>VetustaMorla.xml</IML>
+            </Version>
+        </Cancion>
+        <Cancion estilo="pop">
+            <NombreT>Heart Of Gold</NombreT>
+            <Duracion>3:34</Duracion>
+        </Cancion>
+        <Cancion estilo="pop">
+            <NombreT>Light Me Up (US Version)</NombreT>
+            <Duracion>3:59</Duracion>
+        </Cancion>
+        <Cancion estilo="pop">
+            <NombreT>Words As Weapons (US Version)</NombreT>
+            <Duracion>3:42</Duracion>
+        </Cancion>
+        <Cancion estilo="pop">
+            <NombreT>All You Never Say</NombreT>
+            <Duracion>4:29</Duracion>
+
+        </Cancion>
+        <Cancion estilo="pop">
+            <NombreT>Strange Birds</NombreT>
+            <Duracion>3:04</Duracion>
+
+        </Cancion>
+        <Cancion estilo="pop">
+            <NombreT>Maybe</NombreT>
+            <Duracion>3:15</Duracion>
+
+        </Cancion>
+        <Cancion estilo="pop">
+            <NombreT>No Angel</NombreT>
+            <Duracion>4:03</Duracion>
+        </Cancion>
+        <Cancion estilo="pop">
+            <NombreT>All About You</NombreT>
+            <Duracion>4:38</Duracion>
+        </Cancion>
+        <Cancion estilo="pop">
+            <NombreT>Standing In The Way Of The Light</NombreT>
+            <Duracion>4:04</Duracion>
+        </Cancion>
+        <Cancion estilo="pop">
+            <NombreT>Shine</NombreT>
+            <Duracion>4:04</Duracion>
+        </Cancion>
+        <Cancion estilo="pop">
+            <NombreT>People Help The People</NombreT>
+            <Duracion>4:17</Duracion>
+        </Cancion>
+    </Album>
+</Interprete>

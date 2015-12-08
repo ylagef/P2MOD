@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE Interprete SYSTEM "iml.dtd">
+<Interprete>
+    <Nombre>
+        <NombreG>Vetusta Morla</NombreG>
+        <Id>vmorla</Id>
+    </Nombre>
+    <Nacionalidad>español</Nacionalidad>
+    <Album tipo="nuevo">
+        <NombreA>15151 (En directo)</NombreA>
+        <Año>2015</Año>
+        <Cancion estilo="rock">
+            <Duracion>3:57</Duracion>
+            <NombreT>La Deriva - En Directo</NombreT>
+            <Version>
+                <Nombre>
+                    <NombreC>Ed Sheeran</NombreC>
+                    <Id>edsheeran</Id>
+                </Nombre>
+                <IML>EdSheeran.xml</IML>
+            </Version>
+        </Cancion>
+        <Cancion estilo="rock">
+            <Duracion>4:13</Duracion>
+            <NombreT>Lo Que Te Hace Grande - En Directo</NombreT>
+        </Cancion>
+        <Cancion estilo="rock">
+            <Duracion>3:55</Duracion>
+            <NombreT>Golpe Maestro - En Directo</NombreT>
+        </Cancion>
+        <Cancion estilo="rock">
+            <Duracion>3:59</Duracion>
+            <NombreT>La Mosca en tu Pared</NombreT>
+        </Cancion>
+    </Album>
+    <Album tipo="nuevo">
+        <NombreA>Un Día en el Mundo</NombreA>
+        <Año>2008</Año>
+        <Cancion estilo="rock">
+            <Duracion>4:42</Duracion>
+            <NombreT>Autocrítica</NombreT>
+        </Cancion>
+        <Cancion estilo="rock">
+            <Duracion>3:23</Duracion>
+            <NombreT>Sálvese Quien Pueda</NombreT>
+        </Cancion>
+        <Cancion estilo="rock">
+            <Duracion>4:12</Duracion>
+            <NombreT>Un Día en el Mundo</NombreT>
+        </Cancion>
+        <Cancion estilo="rock">
+            <Duracion>5:04</Duracion>
+            <NombreT>Copenhague</NombreT>
+        </Cancion>
+    </Album>
+</Interprete>

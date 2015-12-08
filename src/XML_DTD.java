@@ -13,12 +13,17 @@ import java.util.List;
 import javax.xml.xpath.*;
 
 public class XML_DTD {
-    public static LinkedList listaInterpretes = new LinkedList<Document>(); //Lista donde se almacenarán los intérpretes. Se pone fuera del Main para poder acceder a ella desde cualquier método.
+
+    public static LinkedList<Document> listaInterpretes = new LinkedList(); //Lista donde se almacenarán los intérpretes. Se pone fuera del Main para poder acceder a ella desde cualquier método.
 
     public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException, XPathExpressionException {
 
         crearListaInterpretes(listaInterpretes); //Crear la lista con todos los xml
 
+        LinkedList<String> listaAux = getNombreInterpretes();
+        for (int m = 0; m < listaAux.size(); m++) {
+            System.out.println(listaAux.get(m));
+        }
         /*
         XPathFactory xPathfactory = XPathFactory.newInstance();
         XPath xpath = xPathfactory.newXPath();
@@ -110,6 +115,9 @@ public class XML_DTD {
 
     //Devuelve una lista de Strings con los Nombres de todos los intérpretes.
     public static LinkedList<String> getNombreInterpretes() throws XPathExpressionException {
+
+        LinkedList<String> interpretes = new LinkedList<>();
+
         XPathFactory xPathfactory = XPathFactory.newInstance();
         XPath xpath = xPathfactory.newXPath();
 
@@ -117,13 +125,15 @@ public class XML_DTD {
 
         for (int i = 0; i < listaInterpretes.size(); i++) {
 
-            NodeList nodes = (NodeList) expr.evaluate(listaInterpretes.get(i), XPathConstants.NODESET);
+            Document doc = listaInterpretes.get(i);
+
+            NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
 
             for (int j = 0; j < nodes.getLength(); j++)
 
-                listaInterpretes.add(nodes.item(j).getNodeValue());
+                interpretes.add(nodes.item(j).getNodeValue());
 
         }
-        return listaInterpretes;
+        return interpretes;
     }
 }

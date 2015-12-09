@@ -16,7 +16,9 @@ import java.util.List;
 
 public class Sint10P2 extends HttpServlet {
 
-    public static LinkedList<Document> listaInterpretes = new LinkedList(); //Lista donde se almacenarán los intérpretes.
+    public static LinkedList<Document> listaInterpretes = new LinkedList<>(); //Lista donde se almacenarán los intérpretes.
+    public static XPathFactory xPathfactory = XPathFactory.newInstance();
+    public static XPath xpath = xPathfactory.newXPath();
 
     public void init() {
         try {
@@ -99,7 +101,11 @@ public class Sint10P2 extends HttpServlet {
                 break;
 
             case "42":
-                pantalla52(req, res);
+                try {
+                    pantalla52(req, res);
+                } catch (XPathExpressionException e) {
+                    e.printStackTrace();
+                }
                 break;
 
             case "0":
@@ -336,7 +342,7 @@ public class Sint10P2 extends HttpServlet {
     }
 
     //FASE 5 DE LA CONSULTA 2
-    public void pantalla52(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+    public void pantalla52(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException, XPathExpressionException {
         res.setContentType("text/html");
         PrintWriter out = res.getWriter();
 
@@ -353,7 +359,7 @@ public class Sint10P2 extends HttpServlet {
         out.println("<input type='hidden' name='anho' value='" + req.getParameter("anho") + "'>");
         out.println("<input type='hidden' name='album' value='" + req.getParameter("album") + "'>");
         out.println("<input type='hidden' name='estilo' value='" + req.getParameter("estilo") + "'>");
-        out.println("<h5> El número de canciones es de: 10 </h5>");
+        out.println("<h5> El número de canciones es de: " + getNumCancionesEstilo(req.getParameter("anho"), req.getParameter("album"), req.getParameter("estilo")) + " </h5>");
         out.println("<input type='submit' value='Atrás' onClick='document.forms[0].action=\"?fase=32\"' class='btn'>");
         out.println("<input type='submit' value='Inicio' onClick='document.forms[0].action=\"?fase=0\"' class='btn'>");
         out.println("</form>");
@@ -367,7 +373,7 @@ public class Sint10P2 extends HttpServlet {
 
 
     //GESTIÓN DE LOS .XML Y CREAR LA LISTA CON LOS DOCUMENTOS
-
+    //CREA LA LINKEDLIST DE DOCUMENTOS CON TODOS LOS XML
     public static void crearListaInterpretes(LinkedList<Document> listaInterpretes) throws XPathExpressionException, IOException, SAXException, ParserConfigurationException {
 
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
@@ -395,12 +401,10 @@ public class Sint10P2 extends HttpServlet {
 
     }
 
+    //LEE EN LOS CAMPOS IML LOS ENLACES Y LOS AÑADE A LA LISTA DE IMLS
     public static void añadirIMLS(LinkedList listaIML, String IN) throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
-
-        XPathFactory xPathfactory = XPathFactory.newInstance();
-        XPath xpath = xPathfactory.newXPath();
 
         Document documento = builder.parse(IN);
 
@@ -413,6 +417,7 @@ public class Sint10P2 extends HttpServlet {
 
     }
 
+    //PASA LOS IML QUE NO ESTÉN YA LEÍDOS A LA LISTA DE NO LEÍDOS
     public static void IMLStoNoLeidos(LinkedList listaIML, LinkedList listaNL, LinkedList listaL) throws ParserConfigurationException, IOException, SAXException {
 
         for (int i = 0; i < listaIML.size(); i++) { //Encontrar los enlaces a otros IML en los campos versión y añadir los documentos relacionados a la lista
@@ -431,12 +436,10 @@ public class Sint10P2 extends HttpServlet {
     /////////////////                                           CONSULTA 1
     ///////////////////////////////////////////////////////////////////////////////////
 
+    //DEVUELVE EL NOMBRE DE TODOS LOS INTÉRPRETES
     public static LinkedList<String> getNombreInterpretes() throws XPathExpressionException {
 
         LinkedList<String> interpretes = new LinkedList<>();
-
-        XPathFactory xPathfactory = XPathFactory.newInstance();
-        XPath xpath = xPathfactory.newXPath();
 
         XPathExpression expr = xpath.compile("/Interprete/Nombre/NombreC/text() | /Interprete/Nombre/NombreG/text()");
 
@@ -454,40 +457,38 @@ public class Sint10P2 extends HttpServlet {
         return interpretes;
     }
 
+    //DEVUELVE LOS NOMBRES DE LOS ÁLBUMS DEL INTERPRETE SELECCIONADO (O TODOS)
     public static LinkedList<String> getAlbumsInterprete(String interprete) throws XPathExpressionException {
+
         LinkedList<String> albums = new LinkedList<>();
 
-        XPathFactory xPathfactory = XPathFactory.newInstance();
-        XPath xpath = xPathfactory.newXPath();
+        XPathExpression exprAlbum;
 
-        XPathExpression exprAlbum = xpath.compile("/Interprete/Album/NombreA/text()");
-        XPathExpression exprInterprete = xpath.compile("/Interprete/Nombre/NombreC/text() | /Interprete/Nombre/NombreG/text()");
+        if (interprete.equalsIgnoreCase("todos")) {
+            exprAlbum = xpath.compile("/Interprete/Album/NombreA/text()");
+        } else {
+            exprAlbum = xpath.compile("/Interprete[Nombre/NombreC='" + interprete + "' or Nombre/NombreG='" + interprete + "']/Album/NombreA/text()");
+        }
 
         for (int i = 0; i < listaInterpretes.size(); i++) {
 
-            NodeList nodesI = (NodeList) exprInterprete.evaluate(listaInterpretes.get(i), XPathConstants.NODESET);
             NodeList nodesA = (NodeList) exprAlbum.evaluate(listaInterpretes.get(i), XPathConstants.NODESET);
 
-            String cond = nodesI.item(0).getTextContent();
-
-            if (cond.equals(interprete) || interprete.equalsIgnoreCase("todos")) {
-
-                for (int j = 0; j < nodesA.getLength(); j++) {
-                    if (!albums.contains(nodesA.item(j).getTextContent())) {
-                        albums.add(nodesA.item(j).getTextContent());
-                    }
+            for (int j = 0; j < nodesA.getLength(); j++) {
+                if (!albums.contains(nodesA.item(j).getTextContent())) {
+                    albums.add(nodesA.item(j).getTextContent());
                 }
             }
+
         }
 
         return albums;
     }
 
+    //DEVUELVE LAS CANCIONES DE LOS ÁLBUMS DEL INTERPRETE SELECCIONADO (O TODAS)
     public static LinkedList<String> getCancionesAlbum(String interprete, String album) throws XPathExpressionException {
-        LinkedList<String> canciones = new LinkedList<>();
 
-        XPathFactory xPathfactory = XPathFactory.newInstance();
-        XPath xpath = xPathfactory.newXPath();
+        LinkedList<String> canciones = new LinkedList<>();
 
         XPathExpression exprCancion;
 
@@ -499,9 +500,9 @@ public class Sint10P2 extends HttpServlet {
             }
         } else {
             if (album.equalsIgnoreCase("todos")) {
-                exprCancion = xpath.compile("/Interprete[NombreC='" + interprete +"' or NombreG='" + interprete + "']/Album/Cancion/NombreT/text()");
+                exprCancion = xpath.compile("/Interprete[Nombre/NombreC='" + interprete + "' or Nombre/NombreG='" + interprete + "']/Album/Cancion/NombreT/text()");
             } else {
-                exprCancion = xpath.compile("/Interprete/Nombre[NombreC='" + interprete +"' or NombreG='" + interprete + "']/Album[NombreA='" + album + "']/Cancion/NombreT/text()");
+                exprCancion = xpath.compile("/Interprete[Nombre/NombreC='" + interprete + "' or Nombre/NombreG='" + interprete + "']/Album[NombreA='" + album + "']/Cancion/NombreT/text()");
             }
         }
 
@@ -522,70 +523,21 @@ public class Sint10P2 extends HttpServlet {
         return canciones;
     }
 
-    /*
-    public static LinkedList<String> getCancionesAlbum(String interprete, String album) throws XPathExpressionException {
-        LinkedList<String> canciones = new LinkedList<>();
-
-        XPathFactory xPathfactory = XPathFactory.newInstance();
-        XPath xpath = xPathfactory.newXPath();
-
-        XPathExpression exprAlbum = xpath.compile("/Interprete/Album/NombreA/text()");
-        XPathExpression exprInterprete = xpath.compile("/Interprete/Nombre/NombreC/text() | /Interprete/Nombre/NombreG/text()");
-
-        XPathExpression exprCancion;
-
-        if (album.equalsIgnoreCase("todos")) {
-            exprCancion = xpath.compile("/Interprete/Album/Cancion/NombreT/text()");
-        } else {
-            exprCancion = xpath.compile("/Interprete/Album[NombreA='" + album + "']/Cancion/NombreT/text()");
-        }
-
-        for (int i = 0; i < listaInterpretes.size(); i++) {
-
-            NodeList nodesI = (NodeList) exprInterprete.evaluate(listaInterpretes.get(i), XPathConstants.NODESET);
-            NodeList nodesA = (NodeList) exprAlbum.evaluate(listaInterpretes.get(i), XPathConstants.NODESET);
-            NodeList nodesC = (NodeList) exprCancion.evaluate(listaInterpretes.get(i), XPathConstants.NODESET);
-
-
-            String condInterprete = nodesI.item(0).getTextContent();
-
-            if (condInterprete.equals(interprete)) {
-
-                for (int j = 0; j < nodesA.getLength(); j++) {
-
-                    for (int k = 0; k < nodesC.getLength(); k++) {
-
-                        if (!canciones.contains(nodesC.item(k).getTextContent())) {
-                            canciones.add(nodesC.item(k).getTextContent());
-                        }
-
-                    }
-                }
-            }
-        }
-
-        return canciones;
-    }
-    */
 
     ///////////////////////////////////////////////////////////////////////////////////
-    /////////////////                                           CONSULTA 2
+    ///////////////                                           CONSULTA 2
     ///////////////////////////////////////////////////////////////////////////////////
 
+    //DEVUELVE LOS DIFERENTES AÑOS DE LOS QUE HAY CANCIONES
     public static LinkedList<String> getAnhos() throws XPathExpressionException {
 
         LinkedList<String> anhos = new LinkedList<>();
-
-        XPathFactory xPathfactory = XPathFactory.newInstance();
-        XPath xpath = xPathfactory.newXPath();
 
         XPathExpression expr = xpath.compile("/Interprete/Album/Año/text()");
 
         for (int i = 0; i < listaInterpretes.size(); i++) {
 
-            Document doc = listaInterpretes.get(i);
-
-            NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+            NodeList nodes = (NodeList) expr.evaluate(listaInterpretes.get(i), XPathConstants.NODESET);
 
             for (int j = 0; j < nodes.getLength(); j++)
 
@@ -596,62 +548,119 @@ public class Sint10P2 extends HttpServlet {
         return anhos;
     }
 
+    //DEVUELVE LOS NOMBRES DE LOS ÁLBUMS DEL AÑO SELECCIONADO (O TODOS)
     public static LinkedList<String> getAlbumsAnhos(String anho) throws XPathExpressionException {
+
         LinkedList<String> albums = new LinkedList<>();
 
-        XPathFactory xPathfactory = XPathFactory.newInstance();
-        XPath xpath = xPathfactory.newXPath();
+        XPathExpression exprAlbum;
 
-        XPathExpression exprAlbum = xpath.compile("/Interprete/Album/NombreA/text()");
-        XPathExpression exprAnho = xpath.compile("/Interprete/Album/Año/text()");
+        if (anho.equalsIgnoreCase("todos")) {
+            exprAlbum = xpath.compile("/Interprete/Album/NombreA/text()");
+        } else {
+            exprAlbum = xpath.compile("/Interprete/Album[Año='" + anho + "']/NombreA/text()");
+        }
 
         for (int i = 0; i < listaInterpretes.size(); i++) {
 
-            NodeList nodesAnho = (NodeList) exprAnho.evaluate(listaInterpretes.get(i), XPathConstants.NODESET);
             NodeList nodesAlbum = (NodeList) exprAlbum.evaluate(listaInterpretes.get(i), XPathConstants.NODESET);
 
             for (int j = 0; j < nodesAlbum.getLength(); j++) {
 
-                String cond = nodesAnho.item(j).getTextContent();
-
-                if (cond.equals(anho) || anho.equalsIgnoreCase("todos")) {
-
-                    if (!albums.contains(nodesAlbum.item(j).getTextContent())) {
-                        albums.add(nodesAlbum.item(j).getTextContent());
-                    }
+                if (!albums.contains(nodesAlbum.item(j).getTextContent())) {
+                    albums.add(nodesAlbum.item(j).getTextContent());
                 }
+
             }
         }
 
         return albums;
     }
 
+    //DEVUELVE LOS ESTILOS DE LAS CANCIONES QUE PERTENECEN AL ÁLBUM DEL AÑO SELECCIONADO (O TODOS)
     public static LinkedList<String> getEstilos(String anho, String album) throws XPathExpressionException {
 
         LinkedList<String> estilos = new LinkedList<>();
 
-        XPathFactory xPathfactory = XPathFactory.newInstance();
-        XPath xpath = xPathfactory.newXPath();
+        XPathExpression exprEstilo;
 
-
-        XPathExpression exprEstilo = xpath.compile("Interprete/Album[NombreA='" + album + "']/Cancion/@estilo");
+        if (anho.equalsIgnoreCase("todos")) {
+            if (album.equalsIgnoreCase("todos")) {
+                exprEstilo = xpath.compile("/Interprete/Album/Cancion/@estilo");
+            } else {
+                exprEstilo = xpath.compile("/Interprete/Album[NombreA='" + album + "']/Cancion/@estilo");
+            }
+        } else {
+            if (album.equalsIgnoreCase("todos")) {
+                exprEstilo = xpath.compile("/Interprete/Album[Año='" + anho + "']/Cancion/@estilo");
+            } else {
+                exprEstilo = xpath.compile("Interprete/Album[NombreA='" + album + "' and Año='" + anho + "']/Cancion/@estilo");
+            }
+        }
 
         for (int i = 0; i < listaInterpretes.size(); i++) {
 
             NodeList nodesEstilo = (NodeList) exprEstilo.evaluate(listaInterpretes.get(i), XPathConstants.NODESET);
 
-            int nodeSize = nodesEstilo.getLength();
-            for (int k = 0; k < nodeSize; k++) {
+            for (int k = 0; k < nodesEstilo.getLength(); k++) {
 
-                String estilo = nodesEstilo.item(k).getTextContent();
-
-                if (!estilos.contains(estilo)) {
-                    estilos.add(estilo);
+                if (!estilos.contains(nodesEstilo.item(k).getTextContent())) {
+                    estilos.add(nodesEstilo.item(k).getTextContent());
                 }
             }
         }
         return estilos;
     }
 
+    //DEVUELVE EL NÚMERO DE CANCIONES DE UN ESTILO
+    public static int getNumCancionesEstilo(String anho, String album, String estilo) throws XPathExpressionException {
+
+        int cantidad = 0;
+
+        XPathExpression exprEstilo;
+
+        if (estilo.equalsIgnoreCase("todos")) {
+            if (anho.equalsIgnoreCase("todos")) {
+                if (album.equalsIgnoreCase("todos")) {
+                    exprEstilo = xpath.compile("/Interprete/Album/Cancion/@estilo");
+                } else {
+                    exprEstilo = xpath.compile("/Interprete/Album[NombreA='" + album + "']/Cancion/@estilo");
+                }
+            } else {
+                if (album.equalsIgnoreCase("todos")) {
+                    exprEstilo = xpath.compile("/Interprete/Album[Año='" + anho + "']/Cancion/@estilo");
+                } else {
+                    exprEstilo = xpath.compile("Interprete/Album[NombreA='" + album + "' and Año='" + anho + "']/Cancion/@estilo");
+                }
+            }
+        } else {
+            if (anho.equalsIgnoreCase("todos")) {
+                if (album.equalsIgnoreCase("todos")) {
+                    exprEstilo = xpath.compile("/Interprete/Album/Cancion[@estilo='" + estilo + "']");
+                } else {
+                    exprEstilo = xpath.compile("/Interprete/Album[NombreA='" + album + "']/Cancion[@estilo='" + estilo + "']");
+                }
+            } else {
+                if (album.equalsIgnoreCase("todos")) {
+                    exprEstilo = xpath.compile("/Interprete/Album[Año='" + anho + "']/Cancion[@estilo='" + estilo + "']");
+                } else {
+                    exprEstilo = xpath.compile("Interprete/Album[NombreA='" + album + "' and Año='" + anho + "']/Cancion[@estilo='" + estilo + "']");
+                }
+            }
+        }
+
+
+        for (int i = 0; i < listaInterpretes.size(); i++) {
+
+            NodeList nodesEstilo = (NodeList) exprEstilo.evaluate(listaInterpretes.get(i), XPathConstants.NODESET);
+            
+            for (int k = 0; k < nodesEstilo.getLength(); k++) {
+                    cantidad++;
+            }
+
+        }
+
+        return cantidad;
+    }
 }
 

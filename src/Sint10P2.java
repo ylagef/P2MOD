@@ -1,6 +1,8 @@
 import org.w3c.dom.Document;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import org.xml.sax.SAXParseException;
+import org.xml.sax.helpers.DefaultHandler;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -8,8 +10,10 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.xpath.*;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -379,7 +383,7 @@ public class Sint10P2 extends HttpServlet {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         DocumentBuilder builder = factory.newDocumentBuilder();
 
-        String URL = "sabina.xml";
+        String URL = "http://178.62.190.10/sabina.xml";
 
         LinkedList listaLeidos = new LinkedList<String>(); //AQUÍ SE ALMACENAN LOS QUE YA SE LEYERON Y SE INTRODUJERON EN LISTAINTERPRETES
         LinkedList listaNoLeidos = new LinkedList<String>(); //SE LEYÓ EL CAMPO IML PERO NO SE INTRODUJO EN LISTAINTERPRETES
@@ -404,9 +408,20 @@ public class Sint10P2 extends HttpServlet {
     //LEE EN LOS CAMPOS IML LOS ENLACES Y LOS AÑADE A LA LISTA DE IMLS
     public static void añadirIMLS(LinkedList listaIML, String IN) throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
+        factory.setValidating(true);
+        DocumentBuilder builder;
 
-        Document documento = builder.parse(IN);
+        builder = factory.newDocumentBuilder();
+        builder.setErrorHandler(new XML_DTD_ErrorHandler());
+        Document documento = null;
+
+
+        if (IN.startsWith("http:")) {
+            documento = builder.parse(new URL(IN).openStream(), "file:///C:/Users/Yeray/apache-tomcat-9.0.0.M1/bin/iml.dtd");
+        } else {
+            documento = builder.parse(new URL("http://178.62.190.10/" + IN).openStream());
+        }
+
 
         XPathExpression expr = xpath.compile("/Interprete/Album/Cancion/Version/IML/text()");
         NodeList nodes = (NodeList) expr.evaluate(documento, XPathConstants.NODESET);
@@ -653,14 +668,33 @@ public class Sint10P2 extends HttpServlet {
         for (int i = 0; i < listaInterpretes.size(); i++) {
 
             NodeList nodesEstilo = (NodeList) exprEstilo.evaluate(listaInterpretes.get(i), XPathConstants.NODESET);
-            
+
             for (int k = 0; k < nodesEstilo.getLength(); k++) {
-                    cantidad++;
+                cantidad++;
             }
 
         }
 
         return cantidad;
     }
-}
 
+
+    public static class XML_DTD_ErrorHandler extends DefaultHandler {
+        public XML_DTD_ErrorHandler() {
+        }
+
+        public void warning(SAXParseException spe) {
+            System.out.println("Warning: " + spe.toString());
+        }
+
+        public void error(SAXParseException spe) {
+            System.out.println("Error: " + spe.toString());
+        }
+
+        public void fatalerror(SAXParseException spe) {
+            System.out.println("Fatal Error: " + spe.toString());
+        }
+
+    }
+
+}

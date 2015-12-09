@@ -18,19 +18,23 @@ public class Sint10P2 extends HttpServlet {
 
     public static LinkedList<Document> listaInterpretes = new LinkedList(); //Lista donde se almacenarán los intérpretes.
 
-    public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
-        res.setContentType("text/html");
-        PrintWriter out = res.getWriter();
-
+    public void init() {
         try {
             crearListaInterpretes(listaInterpretes);
         } catch (XPathExpressionException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         } catch (SAXException e) {
             e.printStackTrace();
         } catch (ParserConfigurationException e) {
             e.printStackTrace();
         }
+    }
+
+    public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+        res.setContentType("text/html");
+        PrintWriter out = res.getWriter();
 
         inicio(req, res);
     }
@@ -42,6 +46,7 @@ public class Sint10P2 extends HttpServlet {
 
         String valorFase = req.getParameter("fase");
         String valorConsulta = req.getParameter("consulta");
+
 
         switch (valorFase) {
 
@@ -70,15 +75,27 @@ public class Sint10P2 extends HttpServlet {
                 break;
 
             case "31":
-                pantalla41(req, res);
+                try {
+                    pantalla41(req, res);
+                } catch (XPathExpressionException e) {
+                    e.printStackTrace();
+                }
                 break;
 
             case "22":
-                pantalla32(req, res);
+                try {
+                    pantalla32(req, res);
+                } catch (XPathExpressionException e) {
+                    e.printStackTrace();
+                }
                 break;
 
             case "32":
-                pantalla42(req, res);
+                try {
+                    pantalla42(req, res);
+                } catch (XPathExpressionException e) {
+                    e.printStackTrace();
+                }
                 break;
 
             case "42":
@@ -141,7 +158,7 @@ public class Sint10P2 extends HttpServlet {
         for (int i = 0; i < listaNombres.size(); i++) {
             out.println("<input type='radio' name='interprete' value='" + listaNombres.get(i) + "'> " + listaNombres.get(i) + "<br>");
         }
-        out.println("<input type='radio' name='interprete' value='todos'> Todos <br>");
+        out.println("<input type='radio' name='interprete' value='todos' checked> Todos <br>");
         out.println("<p><input type='submit' value='Enviar' class='btn'><br>");
         out.println("<input type='submit' value='Atrás' onClick='document.forms[0].action=\"?fase=0\"' class='btn'>");
         out.println("<input type='submit' value='Inicio' onClick='document.forms[0].action=\"?fase=0\"' class='btn'>");
@@ -171,9 +188,9 @@ public class Sint10P2 extends HttpServlet {
         out.println("<form method='POST' action='?fase=31' >");
         out.println("<input type='hidden' name='interprete' value='" + req.getParameter("interprete") + "'>");
         for (int i = 0; i < listaAlbums.size(); i++) {
-            out.println("<input type='radio' name='" + listaAlbums.get(i) + "' value='" + listaAlbums.get(i) + "'> " + listaAlbums.get(i) + "<br>");
+            out.println("<input type='radio' name='album' value='" + listaAlbums.get(i) + "'> " + listaAlbums.get(i) + "<br>");
         }
-        out.println("<input type='radio' name='album' value='todos'> Todos <br>");
+        out.println("<input type='radio' name='album' value='todos' checked> Todos <br>");
         out.println("<p><input type='submit' value='Enviar' class='btn'><br>");
         out.println("<input type='submit' value='Atrás' onClick='document.forms[0].action=\"?fase=1&consulta=1\"' class='btn'>");
         out.println("<input type='submit' value='Inicio' onClick='document.forms[0].action=\"?fase=0\"' class='btn'>");
@@ -184,9 +201,11 @@ public class Sint10P2 extends HttpServlet {
     }
 
     //FASE 4 DE LA CONSULTA 1
-    public void pantalla41(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+    public void pantalla41(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException, XPathExpressionException {
         res.setContentType("text/html");
         PrintWriter out = res.getWriter();
+
+        LinkedList<String> listaCanciones = getCancionesAlbum(req.getParameter("interprete"), req.getParameter("album"));
 
         out.println("<html>");
         out.println("<head>");
@@ -201,10 +220,11 @@ public class Sint10P2 extends HttpServlet {
         out.println("<form method='POST' action='?fase=41' >");
         out.println("<input type='hidden' name='interprete' value='" + req.getParameter("interprete") + "'>");
         out.println("<input type='hidden' name='album' value='" + req.getParameter("album") + "'>");
-        out.println("<li> Canción 1 (duración, descripción) <br>");
-        out.println("<li> Canción 2 (duración, descripción) <br>");
-        out.println("<li> Canción 3 (duración, descripción) <br>");
-        out.println("<li> Canción 4 (duración, descripción) <br>");
+        for (int i = 0; i < listaCanciones.size(); i++) {
+            out.println("<p>" + listaCanciones.get(i) + "</p>");
+        }
+
+
         out.println("<input type='submit' value='Atrás' onClick='document.forms[0].action=\"?fase=21\"' class='btn'>");
         out.println("<input type='submit' value='Inicio' onClick='document.forms[0].action=\"?fase=0\"' class='btn'>");
         out.println("</form>");
@@ -236,7 +256,7 @@ public class Sint10P2 extends HttpServlet {
         for (int i = 0; i < listaAnhos.size(); i++) {
             out.println("<input type='radio' name='anho' value='" + listaAnhos.get(i) + "'> " + listaAnhos.get(i) + "<br>");
         }
-        out.println("<input type='radio' name='anho' value='todos'> Todos <br>");
+        out.println("<input type='radio' name='anho' value='todos' checked> Todos <br>");
         out.println("<p><input type='submit' value='Enviar' class='btn'><br>");
         out.println("<input type='submit' value='Atrás' onClick='document.forms[0].action=\"?fase=0\"' class='btn'>");
         out.println("<input type='submit' value='Inicio' onClick='document.forms[0].action=\"?fase=0\"' class='btn'>");
@@ -247,9 +267,11 @@ public class Sint10P2 extends HttpServlet {
     }
 
     //FASE 3 DE LA CONSULTA 2
-    public void pantalla32(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+    public void pantalla32(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException, XPathExpressionException {
         res.setContentType("text/html");
         PrintWriter out = res.getWriter();
+
+        LinkedList<String> listaAlbums = getAlbumsAnhos(req.getParameter("anho"));
 
         out.println("<html>");
         out.println("<head>");
@@ -263,11 +285,12 @@ public class Sint10P2 extends HttpServlet {
         out.println("<h3>Selecciona un álbum:</h3>");
         out.println("<form method='POST' action='?fase=32' >");
         out.println("<input type='hidden' name='anho' value='" + req.getParameter("anho") + "'>");
-        out.println("<input type='radio' name='album' value='Álbum-1' checked> Álbum 1 <br>");
-        out.println("<input type='radio' name='album' value='Álbum-2'> Álbum 2 <br>");
-        out.println("<input type='radio' name='album' value='Álbum-3'> Álbum 3 <br>");
-        out.println("<input type='radio' name='album' value='Álbum-4'> Álbum 4 <br>");
-        out.println("<input type='radio' name='album' value='todos'> Todos <br>");
+
+        for (int i = 0; i < listaAlbums.size(); i++) {
+            out.println("<input type='radio' name='album' value='" + listaAlbums.get(i) + "'> " + listaAlbums.get(i) + "<br>");
+        }
+
+        out.println("<input type='radio' name='album' value='todos' checked> Todos <br>");
         out.println("<p><input type='submit' value='Enviar' class='btn'><br>");
         out.println("<input type='submit' value='Atrás' onClick='document.forms[0].action=\"?fase=1&consulta=2\"' class='btn'>");
         out.println("<input type='submit' value='Inicio' onClick='document.forms[0].action=\"?fase=0\"' class='btn'>");
@@ -278,9 +301,11 @@ public class Sint10P2 extends HttpServlet {
     }
 
     //FASE 4 DE LA CONSULTA 2
-    public void pantalla42(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
+    public void pantalla42(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException, XPathExpressionException {
         res.setContentType("text/html");
         PrintWriter out = res.getWriter();
+
+        LinkedList<String> listaEstilos = getEstilos(req.getParameter("anho"), req.getParameter("album"));
 
         out.println("<html>");
         out.println("<head>");
@@ -295,11 +320,12 @@ public class Sint10P2 extends HttpServlet {
         out.println("<form method='POST' action='?fase=42' >");
         out.println("<input type='hidden' name='anho' value='" + req.getParameter("anho") + "'>");
         out.println("<input type='hidden' name='album' value='" + req.getParameter("album") + "'>");
-        out.println("<input type='radio' name='estilo' value='Estilo-1' checked> Estilo 1 <br>");
-        out.println("<input type='radio' name='estilo' value='Estilo-2'> Estilo 2 <br>");
-        out.println("<input type='radio' name='estilo' value='Estilo-3'> Estilo 3 <br>");
-        out.println("<input type='radio' name='estilo' value='Estilo-4'> Estilo 4 <br>");
-        out.println("<input type='radio' name='estilo' value='todos'> Todos <br>");
+
+        for (int i = 0; i < listaEstilos.size(); i++) {
+            out.println("<input type='radio' name='estilo' value='" + listaEstilos.get(i) + "'> " + listaEstilos.get(i) + "<br>");
+        }
+
+        out.println("<input type='radio' name='estilo' value='todos' checked> Todos <br>");
         out.println("<p><input type='submit' value='Enviar' class='btn'><br>");
         out.println("<input type='submit' value='Atrás' onClick='document.forms[0].action=\"?fase=22\"' class='btn'>");
         out.println("<input type='submit' value='Inicio' onClick='document.forms[0].action=\"?fase=0\"' class='btn'>");
@@ -401,7 +427,10 @@ public class Sint10P2 extends HttpServlet {
     ////////                            MÉTODOS PARA ACCEDER A LA INFORMACIÓN DEPENDIENDO DE LA PANTALLA EN LA QUE SE ESTÉ
 
 
-    //Devuelve una lista de Strings con los Nombres de todos los intérpretes.
+    ///////////////////////////////////////////////////////////////////////////////////
+    /////////////////                                           CONSULTA 1
+    ///////////////////////////////////////////////////////////////////////////////////
+
     public static LinkedList<String> getNombreInterpretes() throws XPathExpressionException {
 
         LinkedList<String> interpretes = new LinkedList<>();
@@ -431,20 +460,21 @@ public class Sint10P2 extends HttpServlet {
         XPathFactory xPathfactory = XPathFactory.newInstance();
         XPath xpath = xPathfactory.newXPath();
 
-        XPathExpression exprAlbum = xpath.compile("/Interprete/Album/Cancion/NombreT/text()");
+        XPathExpression exprAlbum = xpath.compile("/Interprete/Album/NombreA/text()");
         XPathExpression exprInterprete = xpath.compile("/Interprete/Nombre/NombreC/text() | /Interprete/Nombre/NombreG/text()");
 
         for (int i = 0; i < listaInterpretes.size(); i++) {
 
-            Document doc = listaInterpretes.get(i);
+            NodeList nodesI = (NodeList) exprInterprete.evaluate(listaInterpretes.get(i), XPathConstants.NODESET);
+            NodeList nodesA = (NodeList) exprAlbum.evaluate(listaInterpretes.get(i), XPathConstants.NODESET);
 
-            NodeList nodesI = (NodeList) exprInterprete.evaluate(doc, XPathConstants.NODESET);
-            NodeList nodesA = (NodeList) exprAlbum.evaluate(doc, XPathConstants.NODESET);
+            String cond = nodesI.item(0).getTextContent();
 
-            if (nodesI.item(i).getNodeValue() == interprete) {
-                for (int j = 0; j < nodesI.getLength(); j++) {
-                    if (!albums.contains(nodesA.item(j).getNodeValue())) {
-                        albums.add(nodesA.item(j).getNodeValue());
+            if (cond.equals(interprete) || interprete.equalsIgnoreCase("todos")) {
+
+                for (int j = 0; j < nodesA.getLength(); j++) {
+                    if (!albums.contains(nodesA.item(j).getTextContent())) {
+                        albums.add(nodesA.item(j).getTextContent());
                     }
                 }
             }
@@ -453,11 +483,94 @@ public class Sint10P2 extends HttpServlet {
         return albums;
     }
 
-    public static List<String> getCancionesAlbum(String interprete, String album) throws XPathExpressionException {
+    public static LinkedList<String> getCancionesAlbum(String interprete, String album) throws XPathExpressionException {
         LinkedList<String> canciones = new LinkedList<>();
+
+        XPathFactory xPathfactory = XPathFactory.newInstance();
+        XPath xpath = xPathfactory.newXPath();
+
+        XPathExpression exprCancion;
+
+        if (interprete.equalsIgnoreCase("todos")) {
+            if (album.equalsIgnoreCase("todos")) {
+                exprCancion = xpath.compile("/Interprete/Album/Cancion/NombreT/text()");
+            } else {
+                exprCancion = xpath.compile("/Interprete/Album[NombreA='" + album + "']/Cancion/NombreT/text()");
+            }
+        } else {
+            if (album.equalsIgnoreCase("todos")) {
+                exprCancion = xpath.compile("/Interprete[NombreC='" + interprete +"' or NombreG='" + interprete + "']/Album/Cancion/NombreT/text()");
+            } else {
+                exprCancion = xpath.compile("/Interprete/Nombre[NombreC='" + interprete +"' or NombreG='" + interprete + "']/Album[NombreA='" + album + "']/Cancion/NombreT/text()");
+            }
+        }
+
+
+        for (int i = 0; i < listaInterpretes.size(); i++) {
+
+            NodeList nodesC = (NodeList) exprCancion.evaluate(listaInterpretes.get(i), XPathConstants.NODESET);
+
+            for (int k = 0; k < nodesC.getLength(); k++) {
+
+                if (!canciones.contains(nodesC.item(k).getTextContent())) {
+                    canciones.add(nodesC.item(k).getTextContent());
+                }
+
+            }
+        }
 
         return canciones;
     }
+
+    /*
+    public static LinkedList<String> getCancionesAlbum(String interprete, String album) throws XPathExpressionException {
+        LinkedList<String> canciones = new LinkedList<>();
+
+        XPathFactory xPathfactory = XPathFactory.newInstance();
+        XPath xpath = xPathfactory.newXPath();
+
+        XPathExpression exprAlbum = xpath.compile("/Interprete/Album/NombreA/text()");
+        XPathExpression exprInterprete = xpath.compile("/Interprete/Nombre/NombreC/text() | /Interprete/Nombre/NombreG/text()");
+
+        XPathExpression exprCancion;
+
+        if (album.equalsIgnoreCase("todos")) {
+            exprCancion = xpath.compile("/Interprete/Album/Cancion/NombreT/text()");
+        } else {
+            exprCancion = xpath.compile("/Interprete/Album[NombreA='" + album + "']/Cancion/NombreT/text()");
+        }
+
+        for (int i = 0; i < listaInterpretes.size(); i++) {
+
+            NodeList nodesI = (NodeList) exprInterprete.evaluate(listaInterpretes.get(i), XPathConstants.NODESET);
+            NodeList nodesA = (NodeList) exprAlbum.evaluate(listaInterpretes.get(i), XPathConstants.NODESET);
+            NodeList nodesC = (NodeList) exprCancion.evaluate(listaInterpretes.get(i), XPathConstants.NODESET);
+
+
+            String condInterprete = nodesI.item(0).getTextContent();
+
+            if (condInterprete.equals(interprete)) {
+
+                for (int j = 0; j < nodesA.getLength(); j++) {
+
+                    for (int k = 0; k < nodesC.getLength(); k++) {
+
+                        if (!canciones.contains(nodesC.item(k).getTextContent())) {
+                            canciones.add(nodesC.item(k).getTextContent());
+                        }
+
+                    }
+                }
+            }
+        }
+
+        return canciones;
+    }
+    */
+
+    ///////////////////////////////////////////////////////////////////////////////////
+    /////////////////                                           CONSULTA 2
+    ///////////////////////////////////////////////////////////////////////////////////
 
     public static LinkedList<String> getAnhos() throws XPathExpressionException {
 
@@ -483,5 +596,62 @@ public class Sint10P2 extends HttpServlet {
         return anhos;
     }
 
+    public static LinkedList<String> getAlbumsAnhos(String anho) throws XPathExpressionException {
+        LinkedList<String> albums = new LinkedList<>();
+
+        XPathFactory xPathfactory = XPathFactory.newInstance();
+        XPath xpath = xPathfactory.newXPath();
+
+        XPathExpression exprAlbum = xpath.compile("/Interprete/Album/NombreA/text()");
+        XPathExpression exprAnho = xpath.compile("/Interprete/Album/Año/text()");
+
+        for (int i = 0; i < listaInterpretes.size(); i++) {
+
+            NodeList nodesAnho = (NodeList) exprAnho.evaluate(listaInterpretes.get(i), XPathConstants.NODESET);
+            NodeList nodesAlbum = (NodeList) exprAlbum.evaluate(listaInterpretes.get(i), XPathConstants.NODESET);
+
+            for (int j = 0; j < nodesAlbum.getLength(); j++) {
+
+                String cond = nodesAnho.item(j).getTextContent();
+
+                if (cond.equals(anho) || anho.equalsIgnoreCase("todos")) {
+
+                    if (!albums.contains(nodesAlbum.item(j).getTextContent())) {
+                        albums.add(nodesAlbum.item(j).getTextContent());
+                    }
+                }
+            }
+        }
+
+        return albums;
+    }
+
+    public static LinkedList<String> getEstilos(String anho, String album) throws XPathExpressionException {
+
+        LinkedList<String> estilos = new LinkedList<>();
+
+        XPathFactory xPathfactory = XPathFactory.newInstance();
+        XPath xpath = xPathfactory.newXPath();
+
+
+        XPathExpression exprEstilo = xpath.compile("Interprete/Album[NombreA='" + album + "']/Cancion/@estilo");
+
+        for (int i = 0; i < listaInterpretes.size(); i++) {
+
+            NodeList nodesEstilo = (NodeList) exprEstilo.evaluate(listaInterpretes.get(i), XPathConstants.NODESET);
+
+            int nodeSize = nodesEstilo.getLength();
+            for (int k = 0; k < nodeSize; k++) {
+
+                String estilo = nodesEstilo.item(k).getTextContent();
+
+                if (!estilos.contains(estilo)) {
+                    estilos.add(estilo);
+                }
+            }
+        }
+        return estilos;
+    }
 
 }
+

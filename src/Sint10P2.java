@@ -13,10 +13,9 @@ import javax.xml.xpath.*;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class Sint10P2 extends HttpServlet {
 
@@ -25,17 +24,9 @@ public class Sint10P2 extends HttpServlet {
     public static XPath xpath = xPathfactory.newXPath();
 
     public void init() {
-        try {
-            crearListaInterpretes(listaInterpretes);
-        } catch (XPathExpressionException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (SAXException e) {
-            e.printStackTrace();
-        } catch (ParserConfigurationException e) {
-            e.printStackTrace();
-        }
+
+        crearListaInterpretes(listaInterpretes);
+
     }
 
     public void doGet(HttpServletRequest req, HttpServletResponse res) throws IOException, ServletException {
@@ -128,6 +119,22 @@ public class Sint10P2 extends HttpServlet {
         res.setContentType("text/html");
         PrintWriter out = res.getWriter();
 
+        LinkedList<String> errAux = new LinkedList<>();
+        LinkedList<String> fAux = new LinkedList<>();
+        while (errores.size() > 0) {
+            for (int i = 0; i < errores.size(); i++) {
+                if(!errAux.contains(errores.get(i))){
+                    errAux.add(errores.get(i));
+                }
+            }
+        }
+        while (ficherosError.size() > 0) {
+            for (int i = 0; i < ficherosError.size(); i++) {
+                if(!fAux.contains(ficherosError.get(i))){
+                    fAux.add(ficherosError.get(i));
+                }
+            }
+        }
         out.println("<html>");
         out.println("<head>");
         out.println("<title>Práctica 2</title>");
@@ -136,6 +143,16 @@ public class Sint10P2 extends HttpServlet {
         out.println("</head>");
         out.println("<body>");
         out.println("<h1>Servicio de consulta de información musical</h1>");
+        while (errAux.size() > 0) {
+            for (int i = 0; i < errAux.size(); i++) {
+                out.println("<h2>ERROR: " + errAux.get(i) + "</h2>");
+            }
+        }
+        while (fAux.size() > 0) {
+            for (int i = 0; i < fAux.size(); i++) {
+                out.println("<h2>ERROR: " + fAux.get(i) + "</h2>");
+            }
+        }
         out.println("<h3>Selecciona una consulta:</h3>");
         out.println("<form method='POST' action='?fase=1'>");
         out.println("<input type='radio' name='consulta' value='1' checked> Lista de canciones de un álbum<br>");
@@ -378,48 +395,137 @@ public class Sint10P2 extends HttpServlet {
 
     //GESTIÓN DE LOS .XML Y CREAR LA LISTA CON LOS DOCUMENTOS
     //CREA LA LINKEDLIST DE DOCUMENTOS CON TODOS LOS XML
-    public static void crearListaInterpretes(LinkedList<Document> listaInterpretes) throws XPathExpressionException, IOException, SAXException, ParserConfigurationException {
-
+    public static void crearListaInterpretes(LinkedList<Document> listaInterpretes) {
+        XML_DTD_ErrorHandler errorHandler;
+        errorHandler = new XML_DTD_ErrorHandler();
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder builder = factory.newDocumentBuilder();
+        DocumentBuilder builder;
+        String IN = null;
+        try {
 
-        String URL = "http://178.62.190.10/sabina.xml";
+            builder = factory.newDocumentBuilder();
+            builder.setErrorHandler(errorHandler);
+            String URL = "http://178.62.190.10/sabina.xml";
 
-        LinkedList listaLeidos = new LinkedList<String>(); //AQUÍ SE ALMACENAN LOS QUE YA SE LEYERON Y SE INTRODUJERON EN LISTAINTERPRETES
-        LinkedList listaNoLeidos = new LinkedList<String>(); //SE LEYÓ EL CAMPO IML PERO NO SE INTRODUJO EN LISTAINTERPRETES
-        LinkedList listaIML = new LinkedList<String>(); //LISTA DE IMLS PARA AÑADIR
+            LinkedList listaLeidos = new LinkedList<String>(); //AQUÍ SE ALMACENAN LOS QUE YA SE LEYERON Y SE INTRODUJERON EN LISTAINTERPRETES
+            LinkedList listaNoLeidos = new LinkedList<String>(); //SE LEYÓ EL CAMPO IML PERO NO SE INTRODUJO EN LISTAINTERPRETES
+            LinkedList listaIML = new LinkedList<String>(); //LISTA DE IMLS PARA AÑADIR
 
-        listaNoLeidos.add(URL);
+            listaNoLeidos.add(URL);
 
-        while (listaNoLeidos.size() > 0) {
-            añadirIMLS(listaIML, (String) listaNoLeidos.getFirst()); //Añade a la lista de IML los de los campos IML del doc Sabina
-            listaLeidos.add(listaNoLeidos.getFirst()); //Sabina ya está leído
-            IMLStoNoLeidos(listaIML, listaNoLeidos, listaLeidos); //Pasa los IML (String) a la lista de los No Leídos (Document)
-            listaNoLeidos.removeFirst();
-        }
+            while (listaNoLeidos.size() > 0) {
+                if (añadirIMLS(listaIML, (String) listaNoLeidos.getFirst())) { //Añade a la lista de IML los de los campos IML del doc Sabina
+                    listaLeidos.add(listaNoLeidos.getFirst()); //Sabina ya está leído
+                    IMLStoNoLeidos(listaIML, listaNoLeidos, listaLeidos); //Pasa los IML (String) a la lista de los No Leídos (Document)
+                    listaNoLeidos.removeFirst();
+                } else {
+                    listaNoLeidos.removeFirst();
+                }
+            }
 
-        for (int p = 0; p < listaLeidos.size(); p++) {
-            Document docAuxiliar = builder.parse((String) listaLeidos.get(p));
-            listaInterpretes.add(docAuxiliar);
+            for (int p = 0; p < listaLeidos.size(); p++) {
+                Document docAuxiliar;
+                IN = (String) listaLeidos.get(p);
+                if (IN.startsWith("http:")) {
+                    docAuxiliar = builder.parse(new URL(IN).openStream());
+                } else {
+                    docAuxiliar = builder.parse(new URL("http://178.62.190.10/" + IN).openStream());
+                }
+                //Document docAuxiliar = builder.parse((String) listaLeidos.get(p));
+                listaInterpretes.add(docAuxiliar);
+            }
+        } catch (SAXException e) {
+            if (errorHandler.hasError() || errorHandler.hasWarning() || errorHandler.hasFatalError()) {
+                ficherosError.add("Fichero erróneo: " + IN);
+                errores.add(errorHandler.getMessage());
+                errorHandler.clear();
+            } else {
+                errores.add("Error: " + e.toString());
+                ficherosError.add("Fichero erróneo: " + IN);
+            }
+        } catch (IOException e) {
+            if (errorHandler.hasError() || errorHandler.hasWarning() || errorHandler.hasFatalError()) {
+                ficherosError.add("Fichero erróneo: " + IN);
+                errores.add(errorHandler.getMessage());
+                errorHandler.clear();
+            } else {
+                errores.add("Error: " + e.toString());
+                ficherosError.add("Fichero erróneo: " + IN);
+            }
+        } catch (ParserConfigurationException e) {
+            if (errorHandler.hasError() || errorHandler.hasWarning() || errorHandler.hasFatalError()) {
+                ficherosError.add("Fichero erróneo: " + IN);
+                errores.add(errorHandler.getMessage());
+                errorHandler.clear();
+            } else {
+                errores.add("Error: " + e.toString());
+                ficherosError.add("Fichero erróneo: " + IN);
+            }
+        } catch (XPathExpressionException e) {
+            if (errorHandler.hasError() || errorHandler.hasWarning() || errorHandler.hasFatalError()) {
+                ficherosError.add("Fichero erróneo: " + IN);
+                errores.add(errorHandler.getMessage());
+                errorHandler.clear();
+            } else {
+                errores.add("Error: " + e.toString());
+                ficherosError.add("Fichero erróneo: " + IN);
+            }
         }
 
     }
 
+    public static LinkedList<String> errores = new LinkedList<>();
+    public static LinkedList<String> ficherosError = new LinkedList<>();
+
     //LEE EN LOS CAMPOS IML LOS ENLACES Y LOS AÑADE A LA LISTA DE IMLS
-    public static void añadirIMLS(LinkedList listaIML, String IN) throws XPathExpressionException, ParserConfigurationException, IOException, SAXException {
+    public static boolean añadirIMLS(LinkedList listaIML, String IN) throws XPathExpressionException {
+
         DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
         factory.setValidating(true);
         DocumentBuilder builder;
-
-        builder = factory.newDocumentBuilder();
-        builder.setErrorHandler(new XML_DTD_ErrorHandler());
+        XML_DTD_ErrorHandler errorHandler;
+        errorHandler = new XML_DTD_ErrorHandler();
         Document documento = null;
 
+        try {
+            builder = factory.newDocumentBuilder();
+            builder.setErrorHandler(errorHandler);
 
-        if (IN.startsWith("http:")) {
-            documento = builder.parse(new URL(IN).openStream(), "file:///C:/Users/Yeray/apache-tomcat-9.0.0.M1/bin/iml.dtd");
-        } else {
-            documento = builder.parse(new URL("http://178.62.190.10/" + IN).openStream());
+            if (IN.startsWith("http:")) {
+                documento = builder.parse(new URL(IN).openStream());
+            } else {
+                documento = builder.parse(new URL("http://178.62.190.10/" + IN).openStream());
+            }
+        } catch (ParserConfigurationException e) {
+            if (errorHandler.hasError() || errorHandler.hasWarning() || errorHandler.hasFatalError()) {
+                ficherosError.add("Fichero erróneo: " + IN);
+                errores.add(errorHandler.getMessage());
+                errorHandler.clear();
+            } else {
+                errores.add("Error: " + e.toString());
+                ficherosError.add("Fichero erróneo: " + IN);
+            }
+            return false;
+        } catch (IOException e) {
+            if (errorHandler.hasError() || errorHandler.hasWarning() || errorHandler.hasFatalError()) {
+                ficherosError.add("Fichero erróneo: " + IN);
+                errores.add(errorHandler.getMessage());
+                errorHandler.clear();
+            } else {
+                errores.add("Error: " + e.toString());
+                ficherosError.add("Fichero erróneo: " + IN);
+            }
+            return false;
+        } catch (SAXException e) {
+            if (errorHandler.hasError() || errorHandler.hasWarning() || errorHandler.hasFatalError()) {
+                ficherosError.add("Fichero erróneo: " + IN);
+                errores.add(errorHandler.getMessage());
+                errorHandler.clear();
+            } else {
+                errores.add("Error: " + e.toString());
+                ficherosError.add("Fichero erróneo: " + IN);
+            }
+            return false;
         }
 
 
@@ -430,10 +536,12 @@ public class Sint10P2 extends HttpServlet {
             listaIML.add(nodes.item(i).getNodeValue());
         }
 
+        return true;
+
     }
 
     //PASA LOS IML QUE NO ESTÉN YA LEÍDOS A LA LISTA DE NO LEÍDOS
-    public static void IMLStoNoLeidos(LinkedList listaIML, LinkedList listaNL, LinkedList listaL) throws ParserConfigurationException, IOException, SAXException {
+    public static void IMLStoNoLeidos(LinkedList listaIML, LinkedList listaNL, LinkedList listaL) {
 
         for (int i = 0; i < listaIML.size(); i++) { //Encontrar los enlaces a otros IML en los campos versión y añadir los documentos relacionados a la lista
             if (!listaL.contains(listaIML.get(i))) {
@@ -496,6 +604,8 @@ public class Sint10P2 extends HttpServlet {
             }
 
         }
+
+        Collections.sort(albums);
 
         return albums;
     }
@@ -560,6 +670,7 @@ public class Sint10P2 extends HttpServlet {
                     anhos.add(nodes.item(j).getNodeValue());
                 }
         }
+        Collections.sort(anhos);
         return anhos;
     }
 
@@ -680,21 +791,59 @@ public class Sint10P2 extends HttpServlet {
 
 
     public static class XML_DTD_ErrorHandler extends DefaultHandler {
+
+        public boolean error;
+        public boolean warning;
+        public boolean fatalerror;
+        public String message;
+
         public XML_DTD_ErrorHandler() {
+            error = false;
+            warning = false;
+            fatalerror = false;
+            message = null;
         }
 
-        public void warning(SAXParseException spe) {
-            System.out.println("Warning: " + spe.toString());
+        public void warning(SAXParseException spe) throws SAXException {
+            warning = true;
+            message = "Warning: " + spe.getMessage();
+            throw new SAXException();
         }
 
-        public void error(SAXParseException spe) {
-            System.out.println("Error: " + spe.toString());
+        public void error(SAXParseException spe) throws SAXException {
+            error = true;
+            message = "Error: " + spe.getMessage();
+            throw new SAXException();
         }
 
-        public void fatalerror(SAXParseException spe) {
-            System.out.println("Fatal Error: " + spe.toString());
+        public void fatalerror(SAXParseException spe) throws SAXException {
+            fatalerror = true;
+            message = "Fatal Error: " + spe.getMessage();
+            throw new SAXException();
         }
 
+        public boolean hasWarning() {
+            return warning;
+        }
+
+        public boolean hasError() {
+            return error;
+        }
+
+        public boolean hasFatalError() {
+            return fatalerror;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void clear() {
+            warning = false;
+            error = false;
+            fatalerror = false;
+            message = null;
+        }
     }
 
 }

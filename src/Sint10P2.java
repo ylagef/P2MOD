@@ -121,20 +121,20 @@ public class Sint10P2 extends HttpServlet {
 
         LinkedList<String> errAux = new LinkedList<>();
         LinkedList<String> fAux = new LinkedList<>();
-        while (errores.size() > 0) {
+
             for (int i = 0; i < errores.size(); i++) {
                 if(!errAux.contains(errores.get(i))){
                     errAux.add(errores.get(i));
                 }
             }
-        }
-        while (ficherosError.size() > 0) {
+
             for (int i = 0; i < ficherosError.size(); i++) {
                 if(!fAux.contains(ficherosError.get(i))){
                     fAux.add(ficherosError.get(i));
                 }
             }
-        }
+
+
         out.println("<html>");
         out.println("<head>");
         out.println("<title>Práctica 2</title>");
@@ -143,16 +143,16 @@ public class Sint10P2 extends HttpServlet {
         out.println("</head>");
         out.println("<body>");
         out.println("<h1>Servicio de consulta de información musical</h1>");
-        while (errAux.size() > 0) {
+
             for (int i = 0; i < errAux.size(); i++) {
                 out.println("<h2>ERROR: " + errAux.get(i) + "</h2>");
             }
-        }
-        while (fAux.size() > 0) {
+
             for (int i = 0; i < fAux.size(); i++) {
                 out.println("<h2>ERROR: " + fAux.get(i) + "</h2>");
             }
-        }
+
+
         out.println("<h3>Selecciona una consulta:</h3>");
         out.println("<form method='POST' action='?fase=1'>");
         out.println("<input type='radio' name='consulta' value='1' checked> Lista de canciones de un álbum<br>");
